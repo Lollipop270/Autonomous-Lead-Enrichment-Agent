@@ -191,7 +191,7 @@ The generated results are stored at:
 
 output/output.json
 
-## Assignment Requirements Covered
+### Assignment Requirements Covered
 
 This project is designed to address the core requirements of the Autonomous Lead Enrichment Agent assignment.
 
@@ -382,17 +382,17 @@ Model pricing should be verified against the current Gemini API pricing before u
 
 ## Design Decisions
 
-Why Playwright?
+#### Why Playwright?
 Playwright provides reliable headless browser automation and supports JavaScript-rendered websites that may not expose useful content through a simple HTTP request.
 
 This is particularly useful for modern company websites where important content is rendered dynamically in the browser.
 
-Why BeautifulSoup?
+#### Why BeautifulSoup?
 BeautifulSoup is used to parse the rendered HTML and remove unnecessary DOM elements before the content reaches the LLM.
 
 This reduces token usage and improves extraction quality.
 
-Why Gemini?
+#### Why Gemini?
 Google Gemini provides structured output capabilities that can be validated against Pydantic models.
 
 The LLM provider is isolated inside:
@@ -401,17 +401,17 @@ app/llm.py
 
 This keeps the rest of the application independent of the specific model provider and makes future provider changes easier.
 
-Why Pydantic?
+#### Why Pydantic?
 Pydantic provides explicit schemas and validation for the LLM response.
 
 This reduces malformed outputs and makes downstream processing predictable.
 
-Why deterministic email extraction?
+#### Why deterministic email extraction?
 Emails are extracted using a deterministic regular expression in addition to LLM extraction.
 
 This provides an independent extraction mechanism for an important lead-enrichment field and reduces dependence on the LLM for straightforward pattern-based data.
 
-Why domain-restricted crawling?
+#### Why domain-restricted crawling?
 The agent is intended to enrich company information from the company's own public web presence.
 
 Restricting crawling to the target domain prevents uncontrolled traversal and reduces unnecessary requests.
