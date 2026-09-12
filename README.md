@@ -77,7 +77,7 @@ output/output.json
 
 ---
 
-##Project Structure
+## Project Structure
 
 ```text
 ai-lead-enrichment/
@@ -106,7 +106,7 @@ ai-lead-enrichment/
 
 ---
 
-##Requirements
+## Requirements
 
 - Python 3.10+
 - Google Gemini API key
@@ -116,7 +116,7 @@ ai-lead-enrichment/
 
 ---
 
-##Installation
+## Installation
 
 1. Clone the repository
 git clone <your-github-repository-url>
@@ -148,7 +148,7 @@ playwright install chromium
 
 ---
 
-##Environment Variables
+## Environment Variables
 
 Create a .env file in the project root.
 
@@ -169,7 +169,7 @@ The repository should contain .env.example, but not the actual .env file.
 
 ---
 
-##Running the Agent
+## Running the Agent
 
 The application accepts one or more company domains from the command line.
 
@@ -379,7 +379,7 @@ Model pricing should be verified against the current Gemini API pricing before u
 
 ---
 
-##Design Decisions
+## Design Decisions
 
 Why Playwright?
 Playwright provides reliable headless browser automation and supports JavaScript-rendered websites that may not expose useful content through a simple HTTP request.
@@ -417,7 +417,7 @@ Restricting crawling to the target domain prevents uncontrolled traversal and re
 
 ---
 
-##Output
+## Output
 
 Each processed company produces structured information containing:
 
@@ -463,7 +463,7 @@ The actual output values depend on the content returned by each website and shou
 
 ---
 
-##Testing
+## Testing
 
 The project includes tests under:
 
@@ -518,7 +518,7 @@ tests/test_schemas.py ... PASSED
 
 ---
 
-##Error Isolation
+## Error Isolation
 
 The pipeline processes domains independently.
 
@@ -534,7 +534,7 @@ This design is important for batch lead-enrichment workflows where one problemat
 
 ---
 
-##Rate Limits
+## Rate Limits
 
 The crawler uses configurable page limits and timeouts to prevent uncontrolled crawling.
 
@@ -548,7 +548,7 @@ These values can be adjusted depending on the desired balance between coverage, 
 
 ---
 
-##Troubleshooting
+## Troubleshooting
 
 ModuleNotFoundError
 If Python reports that a package is missing, make sure the virtual environment is activated:
@@ -610,7 +610,7 @@ The pipeline records errors where possible and continues processing the remainin
 
 ---
 
-##Assignment Test Targets
+## Assignment Test Targets
 
 The implementation was designed to run against the three domains specified in the assignment:
 
@@ -630,7 +630,7 @@ The output should contain one result object per requested domain.
 
 ---
 
-##Sample Output File
+## Sample Output File
 
 The repository should include:
 
@@ -643,9 +643,3 @@ supabase.com
 vapi.ai
 
 
-
-Confidence scoring
-Error isolation
-Automated testing
-Approximate cost tracking
-Optional external search and fully agentic navigation are intentionally not required for the core implementation.lly not required for the core implementation.
