@@ -119,32 +119,32 @@ ai-lead-enrichment/
 ## Installation
 
 1. Clone the repository
-git clone <your-github-repository-url>
-cd ai-lead-enrichment
+   git clone <your-github-repository-url>
+   cd ai-lead-enrichment
 
 2. Create a virtual environment
-Windows
-python -m venv .venv
+   Windows
+   python -m venv .venv
 
-macOS/Linux
-python3 -m venv .venv
+   macOS/Linux
+   python3 -m venv .venv
 
 3. Activate the virtual environment
-Windows PowerShell
-.venv\Scripts\activate
+   Windows PowerShell
+   .venv\Scripts\activate
 
-macOS/Linux
-source .venv/bin/activate
+   macOS/Linux
+   source .venv/bin/activate
 
-After activation, the terminal should show something similar to:
+   After activation, the terminal should show something similar to:
 
-(.venv)
+   (.venv)
 
 4. Install Python dependencies
-python -m pip install -r requirements.txt
+   python -m pip install -r requirements.txt
 
 5. Install Playwright Chromium
-playwright install chromium
+   playwright install chromium
 
 ---
 
@@ -191,7 +191,8 @@ The generated results are stored at:
 
 output/output.json
 
-##Assignment Requirements Covered
+## Assignment Requirements Covered
+
 This project is designed to address the core requirements of the Autonomous Lead Enrichment Agent assignment.
 
 Step 1: Automated Browsing & Content Retrieval
