@@ -526,11 +526,11 @@ This design is important for batch lead-enrichment workflows where one problemat
 The crawler uses configurable page limits and timeouts to prevent uncontrolled crawling.
 
 ### Relevant settings include:
-
+```text
 MAX_PAGES_PER_DOMAIN=8
 PAGE_TIMEOUT_MS=20000
 MAX_CONTENT_CHARS=60000
-
+```
 These values can be adjusted depending on the desired balance between coverage, latency, and cost.
 
 ---
