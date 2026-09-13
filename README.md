@@ -153,18 +153,16 @@ ai-lead-enrichment/
 Create a .env file in the project root.
 
 Example:
-
+```text
 GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-3.6-flash
 
 MAX_PAGES_PER_DOMAIN=8
 PAGE_TIMEOUT_MS=20000
 MAX_CONTENT_CHARS=60000
-
+```
 The Gemini API key can be created using Google AI Studio.
-
 Never commit .env to the repository.
-
 The repository should contain .env.example, but not the actual .env file.
 
 ---
@@ -174,19 +172,19 @@ The repository should contain .env.example, but not the actual .env file.
 The application accepts one or more company domains from the command line.
 
 For example:
-
+```text
 python -m app.main postman.com
-
+```
 For the complete assignment test:
-
+```text
 python -m app.main postman.com supabase.com vapi.ai
-
+```
 The three required test targets are:
-
+```text
 postman.com
 supabase.com
 vapi.ai
-
+```
 The generated results are stored at:
 
 output/output.json
@@ -242,9 +240,9 @@ footer
 The remaining content is converted into clean text and excessive whitespace is removed.
 
 The resulting text is also bounded using:
-
+```text
 MAX_CONTENT_CHARS
-
+```
 This reduces unnecessary LLM input, latency, and API cost.
 
 Public email addresses are additionally extracted deterministically using a regular expression.
@@ -262,14 +260,14 @@ Relevant page content
 The output is validated against Pydantic models.
 
 The primary extraction schema contains:
-
+```text
 Company Overview
 Target Audience / ICP
 Contact Points
 Leadership / Team Members
 Company Overview
 A concise two-sentence description of what the company does.
-
+```
 Target Audience / ICP
 The likely primary customer or user group based only on the supplied website content.
 
@@ -289,14 +287,14 @@ Pydantic provides an explicit schema for the LLM response.
 This makes the output predictable and easier to consume downstream.
 
 The structured extraction model includes fields such as:
-
+```text
 company_overview
 target_audience
 contact_points
 leadership
-
+```
 The final company result additionally contains:
-
+```text
 domain
 confidence_score
 pages_scraped
@@ -304,7 +302,7 @@ errors
 estimated_input_tokens
 estimated_output_tokens
 estimated_cost_usd
-
+```
 This ensures that the final JSON output follows a consistent structure even when some information is unavailable.
 
 #### Step 4: Fallback & Resilience
@@ -347,19 +345,14 @@ The confidence score is calculated from observable extraction signals rather tha
 
 ## Signals include:
 
-Company overview successfully extracted
-Target audience identified
-Public contact email found
-Leadership identified
-LinkedIn profile discovered
-Multiple relevant pages successfully crawled
-The final score is normalized to a range of:
-
-0.0 - 1.0
-
-A higher score indicates that more of the expected company intelligence was successfully identified.
-
-The score is intended as an estimate of extraction completeness and quality rather than a guarantee that every extracted fact is correct.
+- Company overview successfully extracted
+- Target audience identified
+- Public contact email found
+- Leadership identified
+- LinkedIn profile discovered
+- Multiple relevant pages successfully crawled
+- The final score is normalized to a range of: 0.0 - 1.0
+  A higher score indicates that more of the expected company intelligence was successfully identified. The score is intended   as an estimate of extraction completeness and quality rather than a guarantee that every extracted fact is correct.
 
 ## Token & Cost Tracking
 The project includes approximate token and API cost tracking as an optional bonus feature.
@@ -494,14 +487,14 @@ A successful test run should look similar to:
 
 platform win32 -- Python ...
 plugins: ...
-collected 21 items
+collected 32 items
 
 tests/test_crawler.py ... PASSED
 tests/test_extractor.py ... PASSED
 tests/test_resilience.py ... PASSED
 tests/test_schemas.py ... PASSED
 
-====================================== 21 passed ==============================================
+====================================== 32 passed ==============================================
 ```
 ---
 
