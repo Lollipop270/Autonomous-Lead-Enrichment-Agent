@@ -91,6 +91,7 @@ ai-lead-enrichment/
 │   ├── schemas.py              # Pydantic models
 │   ├── resilience.py           # Retry/error-handling utilities
 │   └── cost_tracker.py         # Token/cost estimation
+│   └── linkedin_finder.py
 ├── output/
 │   └── output.json
 ├── tests/
@@ -98,6 +99,7 @@ ai-lead-enrichment/
 │   ├── test_extractor.py
 │   ├── test_resilience.py
 │   └── test_schemas.py
+│   └── test_linkedin_finder.py
 ├── .env.example
 ├── .gitignore
 ├── requirements.txt
@@ -198,17 +200,18 @@ The crawler uses Playwright with Chromium in headless mode.
 
 For each company domain, the crawler:
 
-Opens the company homepage.
-Waits for the page to load.
-Supports JavaScript-rendered content through browser automation.
-Extracts internal links from the rendered page.
-Restricts discovered links to the target domain and its subdomains.
-Normalizes discovered URLs.
-Removes duplicate URLs.
-Prioritizes relevant company pages.
-Crawls pages until the configured page limit is reached.
-Relevant paths include:
+1. Opens the company homepage.
+2. Waits for the page to load.
+3. Supports JavaScript-rendered content through browser automation.
+4.Extracts internal links from the rendered page.
+5. Restricts discovered links to the target domain and its subdomains.
+6. Normalizes discovered URLs.
+7. Removes duplicate URLs.
+8. Prioritizes relevant company pages.
+9. Crawls pages until the configured page limit is reached.
 
+Relevant paths include:
+```text
 /about
 /about-us
 /company
@@ -217,7 +220,7 @@ Relevant paths include:
 /contact-us
 /pricing
 /leadership
-
+```
 This allows the pipeline to find useful company information without crawling an uncontrolled number of pages.
 
 #### Step 2: Context Pre-Processing & Token Optimization
@@ -226,7 +229,7 @@ Raw HTML is never directly sent to Gemini.
 Before LLM processing, the HTML is parsed using BeautifulSoup.
 
 The preprocessing pipeline removes unnecessary DOM elements including:
-
+```text
 script
 style
 svg
@@ -236,7 +239,7 @@ canvas
 template
 nav
 footer
-
+```
 The remaining content is converted into clean text and excessive whitespace is removed.
 
 The resulting text is also bounded using:
@@ -245,20 +248,18 @@ MAX_CONTENT_CHARS
 ```
 This reduces unnecessary LLM input, latency, and API cost.
 
-Public email addresses are additionally extracted deterministically using a regular expression.
-
-This provides an independent extraction mechanism for an important lead-enrichment field.
+Public email addresses are additionally extracted deterministically using a regular expression. This provides an independent extraction mechanism for an important lead-enrichment field.
 
 #### Step 3: LLM Structured Extraction
 The project uses Google Gemini for structured information extraction.
 
 The LLM receives:
-
+```text
 Company domain
 Cleaned website content
 Relevant page content
 The output is validated against Pydantic models.
-
+```
 The primary extraction schema contains:
 ```text
 Company Overview
@@ -268,23 +269,10 @@ Leadership / Team Members
 Company Overview
 A concise two-sentence description of what the company does.
 ```
-Target Audience / ICP
-The likely primary customer or user group based only on the supplied website content.
-
-Contact Points
-Public or generic email addresses explicitly found in the website content.
-
-Leadership / Team Members
-People explicitly identified on the website as founders, executives, leaders, or notable team members.
-
-Where available, the system records LinkedIn profile URLs that are explicitly present in the supplied website content.
-
-The model is instructed not to invent information that is not supported by the supplied website content.
-
-Pydantic Structured Validation
-Pydantic provides an explicit schema for the LLM response.
-
-This makes the output predictable and easier to consume downstream.
+1. Target Audience / ICP: The likely primary customer or user group based only on the supplied website content.
+2. Contact Points: Public or generic email addresses explicitly found in the website content.
+3. Leadership / Team Members: People explicitly identified on the website as founders, executives, leaders, or notable team     members. Where available, the system records LinkedIn profile URLs that are explicitly present in the supplied website       content or searches for them using Playwright. The model is instructed not to invent information that is not supported by    the supplied website content.
+4. Pydantic Structured Validation: Pydantic provides an explicit schema for the LLM response. This makes the output             predictable and easier to consume downstream.
 
 The structured extraction model includes fields such as:
 ```text
@@ -309,7 +297,7 @@ This ensures that the final JSON output follows a consistent structure even when
 The application is designed so that failure on one website does not terminate the entire run.
 
 Common failure conditions include:
-
+```text
 Page timeouts
 404 pages
 Empty pages
@@ -320,7 +308,7 @@ JavaScript rendering issues
 Websites returning unusable content
 LLM extraction failures
 Errors are captured in the corresponding company's errors array.
-
+```
 For example:
 ```text
 {
@@ -358,11 +346,11 @@ The confidence score is calculated from observable extraction signals rather tha
 The project includes approximate token and API cost tracking as an optional bonus feature.
 
 The system records:
-
+```text
 estimated_input_tokens
 estimated_output_tokens
 estimated_cost_usd
-
+```
 Token counts are approximate and are intended for monitoring rather than billing-grade accounting.
 
 Cost configuration is maintained separately in:
@@ -400,7 +388,7 @@ The agent is intended to enrich company information from the company's own publi
 ## Output
 
 Each processed company produces structured information containing:
-
+```text
 Company overview
 Target audience / ICP
 Public contact emails
@@ -412,6 +400,7 @@ Errors encountered
 Estimated input tokens
 Estimated output tokens
 Estimated API cost
+```
 Example:
 ```text
 {
@@ -450,7 +439,7 @@ The project includes tests under:
 tests/
 
 Current test coverage includes:
-
+```text
 Same-domain URL validation
 Subdomain handling
 External-domain rejection
@@ -471,7 +460,7 @@ Optional LinkedIn fields
 Default list values
 Confidence score validation
 Run the complete test suite from the repository root:
-
+```
 python -m pytest -v
 
 Expected result:
@@ -500,17 +489,11 @@ tests/test_schemas.py ... PASSED
 
 ## Error Isolation
 
-The pipeline processes domains independently.
-
-For example, if three domains are provided:
-
+The pipeline processes domains independently. For example, if three domains are provided:
+```text
 python -m app.main postman.com supabase.com vapi.ai
-
-and one website fails because of a timeout or blocking mechanism, the other domains can still be processed.
-
-A failed domain is represented in the output rather than terminating the complete program.
-
-This design is important for batch lead-enrichment workflows where one problematic website should not prevent the remaining companies from being processed.
+```
+and one website fails because of a timeout or blocking mechanism, the other domains can still be processed. A failed domain is represented in the output rather than terminating the complete program. This design is important for batch lead-enrichment workflows where one problematic website should not prevent the remaining companies from being processed.
 
 ---
 
@@ -533,23 +516,23 @@ These values can be adjusted depending on the desired balance between coverage, 
 #### ModuleNotFoundError
 
 If Python reports that a package is missing, make sure the virtual environment is activated:
-
+```text
 .venv\Scripts\activate
-
+```
 #### Then reinstall dependencies:
-
+```text
 python -m pip install -r requirements.txt
-
+```
 #### pytest is not recognized on Windows
 
 Instead of:
-
+```text
 pytest -v
-
+```
 use:
-
+```text
 python -m pytest -v
-
+```
 This ensures that pytest is executed from the currently active Python environment.
 
 #### Gemini API Key Error
@@ -559,7 +542,7 @@ If you see:
 GEMINI_API_KEY is missing
 
 check that:
-
+```text
 .env exists in the project root.
 The variable is named exactly GEMINI_API_KEY.
 The API key is valid.
@@ -567,13 +550,13 @@ The virtual environment is active.
 Example:
 
 GEMINI_API_KEY=your_gemini_api_key_here
-
+```
 #### Playwright Browser Error
 
 If Playwright reports that Chromium is missing, run:
-
+```text
 playwright install chromium
-
+```
 #### Website Timeout
 
 If a website takes too long to load, the crawler records the failure and continues processing other domains.
@@ -583,28 +566,28 @@ PAGE_TIMEOUT_MS=20000
 #### Empty or Incomplete Website Content
 
 Some websites may return limited content because of:
-Bot protection
-Client-side rendering
-Rate limiting
-Temporary network problems
-Geo-specific content
-Website changes
-The pipeline records errors where possible and continues processing the remaining domains.
+- Bot protection
+- Client-side rendering
+- Rate limiting
+- Temporary network problems
+- Geo-specific content
+- Website changes
+- The pipeline records errors where possible and continues processing the remaining domains.
 
 ---
 
 ## Assignment Test Targets
 
 The implementation was designed to run against the three domains specified in the assignment:
-
+```text
 postman.com
 supabase.com
 vapi.ai
-
+```
 Run them together using:
-
+```text
 python -m app.main postman.com supabase.com vapi.ai
-
+```
 After completion, inspect:
 
 output/output.json
