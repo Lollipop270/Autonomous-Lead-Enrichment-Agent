@@ -18,7 +18,8 @@ The pipeline is designed to be modular, resilient, token-efficient, and suitable
 - Strict Pydantic structured outputs
 - Public email extraction using deterministic regex matching
 - Leadership/team member extraction
-- LinkedIn URL extraction when explicitly present in website content
+- Browser-based LinkedIn profile discovery for extracted leadership members
+- LinkedIn discovery without requiring a separate search API key
 - Confidence scoring
 - Timeout and page-failure handling
 - Per-domain error isolation
@@ -68,12 +69,21 @@ Google Gemini
 Pydantic Structured Output
       |
       v
+Leadership Names
+      |
+      v
+Browser-Based LinkedIn Discovery
+      |
+      v
+LinkedIn Profile URLs
+      |
+      v
 Confidence Scoring
       |
       v
 output/output.json
-```
 
+```
 
 ---
 
@@ -91,7 +101,7 @@ ai-lead-enrichment/
 │   ├── schemas.py              # Pydantic models
 │   ├── resilience.py           # Retry/error-handling utilities
 │   └── cost_tracker.py         # Token/cost estimation
-│   └── linkedin_finder.py
+│   └── linkedin_finder.py      # Browser-based LinkedIn discovery
 ├── output/
 │   └── output.json
 ├── tests/
@@ -293,21 +303,88 @@ estimated_cost_usd
 ```
 This ensures that the final JSON output follows a consistent structure even when some information is unavailable.
 
-#### Step 4: Fallback & Resilience
+
+Only do this **after you actually create `linkedin.py` and its test file**.
+
+---
+
+#### Step 4: LinkedIn Profile Discovery
+
+The initial Gemini extraction intentionally does not guess LinkedIn URLs.
+
+For example, Gemini may return:
+
+```json
+{
+  "name": "Abhinav Asthana",
+  "role": "CEO/Co-Founder",
+  "linkedin_url": null
+}
+```
+The extracted leadership names are then passed to a separate browser-based LinkedIn discovery step.
+The process is:
+```json
+Leadership names
+      |
+      v
+Playwright browser
+      |
+      v
+Web search
+      |
+      v
+LinkedIn profile candidates
+      |
+      v
+Profile validation
+      |
+      v
+linkedin_url
+```
+The system uses Playwright to perform browser-based discovery rather than relying on a separate search API. This means that no additional search API key such as SerpAPI, Tavily, Bing Search API, or Google Custom Search API is required. The system should never construct a LinkedIn URL purely from a person's name.
+
+For example, it should not assume:
+```text
+https://www.linkedin.com/in/abhinav-asthana
+```
+is the correct profile.
+
+Instead, the URL should come from an actual discovered search result and should be validated against available information such as the person's name, company, and role.
+If a reliable match cannot be found, the system leaves:
+```text
+"linkedin_url": null
+```
+This prevents the system from fabricating or incorrectly attributing LinkedIn profiles.
+
+###### LinkedIn Discovery Limitations
+Browser-based search is less reliable than a dedicated search API.
+
+A profile may not be found because of:
+- Search engine blocking
+- CAPTCHA
+- LinkedIn rate limiting
+- Multiple people with the same name
+- Different name spellings
+- Search result ranking
+- Regional search differences
+- LinkedIn profile visibility
+- Temporary network errors
+- The pipeline treats LinkedIn discovery as an enrichment step. Failure to find a LinkedIn profile does not terminate the -    company enrichment process.
+
+#### Step 5: Fallback & Resilience
 The application is designed so that failure on one website does not terminate the entire run.
 
 Common failure conditions include:
-```text
-Page timeouts
-404 pages
-Empty pages
-Failed page navigation
-Link discovery failures
-Missing page elements
-JavaScript rendering issues
-Websites returning unusable content
-LLM extraction failures
-Errors are captured in the corresponding company's errors array.
+- Page timeouts
+- 404 pages
+- Empty pages
+- Failed page navigation
+- Link discovery failures
+- Missing page elements
+- JavaScript rendering issues
+- Websites returning unusable content
+- LLM extraction failures
+- Errors are captured in the corresponding company's errors array.
 ```
 For example:
 ```text
@@ -321,7 +398,6 @@ For example:
 }
 ```
 The application then continues processing the remaining domains.
-
 Retry and resilience functionality is separated into:
 
 app/resilience.py
@@ -383,6 +459,9 @@ Emails are extracted using a deterministic regular expression in addition to LLM
 #### Why domain-restricted crawling?
 The agent is intended to enrich company information from the company's own public web presence. Restricting crawling to the target domain prevents uncontrolled traversal and reduces unnecessary requests.
 
+#### Why Browser-Based LinkedIn Discovery?
+The assignment benefits from LinkedIn information, but using a separate search API would introduce another API dependency and potentially another API key. The project therefore uses Playwright for browser-based discovery. Gemini first identifies the relevant leadership members. Their names are then used as search inputs to discover potential LinkedIn profiles. The system does not construct LinkedIn URLs from names because LinkedIn profile URLs cannot be reliably inferred from a person's name. If a reliable profile cannot be identified, the `linkedin_url` field remains `null`. This approach keeps the implementation simple and avoids requiring an additional search API key.
+
 ---
 
 ## Output
@@ -393,7 +472,7 @@ Company overview
 Target audience / ICP
 Public contact emails
 Leadership/team members
-LinkedIn URLs when explicitly discoverable from website content
+LinkedIn URLs when reliably discovered
 Confidence score
 Successfully scraped pages
 Errors encountered
@@ -439,30 +518,34 @@ The project includes tests under:
 tests/
 
 Current test coverage includes:
-```text
-Same-domain URL validation
-Subdomain handling
-External-domain rejection
-URL normalization
-Relevant-page ranking
-Duplicate link handling
-URL scoring
-Email extraction
-Email deduplication
-Email case normalization
-HTML cleaning
-Async retry behavior
-Retry exhaustion
-Non-retryable error handling
-Invalid retry configuration
-Pydantic schema validation
-Optional LinkedIn fields
-Default list values
-Confidence score validation
-Run the complete test suite from the repository root:
-```
-python -m pytest -v
 
+- Same-domain URL validation
+- Subdomain handling
+- External-domain rejection
+- URL normalization
+- Relevant-page ranking
+- Duplicate link handling
+- URL scoring
+- Email extraction
+- Email deduplication
+- Email case normalization
+- HTML cleaning
+- Async retry behavior
+- Retry exhaustion
+- Non-retryable error handling
+- Invalid retry configuration
+- Pydantic schema validation
+- Optional LinkedIn fields
+- Default list values
+- Confidence score validation
+- LinkedIn URL validation
+- LinkedIn candidate matching
+- LinkedIn discovery failure handling
+
+Run the complete test suite from the repository root:
+```text
+python -m pytest -v
+```
 Expected result:
 
 21 passed
@@ -573,6 +656,18 @@ Some websites may return limited content because of:
 - Geo-specific content
 - Website changes
 - The pipeline records errors where possible and continues processing the remaining domains.
+
+#### LinkedIn Profile Not Found
+
+A LinkedIn URL may remain `null` when:
+- The person cannot be uniquely identified.
+- Search results do not contain a relevant LinkedIn profile.
+- Search engines block automated requests.
+- LinkedIn blocks or limits access.
+- Multiple people have the same name.
+- The profile is not publicly discoverable.
+
+The system intentionally does not fabricate LinkedIn URLs. LinkedIn discovery failure does not terminate the overall company enrichment process.
 
 ---
 
