@@ -1,0 +1,109 @@
+[
+  {
+    "domain": "postman.com",
+    "company_overview": "Postman is an API platform used to develop, test, manage, and distribute APIs. It streamlines collaboration across the API lifecycle to help software engineers and enterprise organizations build better APIs faster.",
+    "target_audience": "Software engineers, API developers, and enterprise organizations building, testing, and managing APIs.",
+    "contact_points": [
+      "help@postman.com",
+      "info-jp@postman.com",
+      "info@postman.com"
+    ],
+    "leadership": [
+      {
+        "name": "Abhinav Asthana",
+        "role": "CEO/Co-Founder",
+        "linkedin_url": null
+      },
+      {
+        "name": "Ankit Sobti",
+        "role": "CTO/Co-Founder",
+        "linkedin_url": null
+      },
+      {
+        "name": "Abhijit Kane",
+        "role": "Product Architect/Co-Founder",
+        "linkedin_url": null
+      }
+    ],
+    "confidence_score": 0.9,
+    "pages_scraped": [
+      "https://postman.com",
+      "https://postman.com/company/press-media",
+      "https://postman.com/company/about-postman",
+      "https://postman.com/company/contact-sales",
+      "https://postman.com/company/careers",
+      "https://postman.com/company/contact-us",
+      "https://postman.com/pricing",
+      "https://postman.com/product"
+    ],
+    "errors": [],
+    "estimated_input_tokens": 13837,
+    "estimated_output_tokens": 168,
+    "estimated_cost_usd": 0.004571
+  },
+  {
+    "domain": "supabase.com",
+    "company_overview": "Supabase is an open-source Postgres development platform that provides integrated tools including databases, authentication, storage, edge functions, and vector embeddings. It allows developers to rapidly build full-stack applications in a weekend and scale seamlessly to millions of users.",
+    "target_audience": "Developers, software engineers, AI builders, and companies ranging from early-stage startups to enterprises seeking a full-stack Postgres database and backend platform.",
+    "contact_points": [
+      "abuse@supabase.com",
+      "help-events@supabase.com",
+      "legal@supabase.com",
+      "privacy@supabase.com",
+      "security@supabase.com"
+    ],
+    "leadership": [
+      {
+        "name": "Tracy Lane",
+        "role": "General Counsel",
+        "linkedin_url": null
+      }
+    ],
+    "confidence_score": 0.9,
+    "pages_scraped": [
+      "https://supabase.com",
+      "https://supabase.com/company",
+      "https://supabase.com/contact-us",
+      "https://supabase.com/pricing",
+      "https://supabase.com/contact/sales",
+      "https://supabase.com/customers",
+      "https://supabase.com/solutions/ai-builders",
+      "https://supabase.com/solutions/no-code"
+    ],
+    "errors": [],
+    "estimated_input_tokens": 11576,
+    "estimated_output_tokens": 179,
+    "estimated_cost_usd": 0.00392
+  },
+  {
+    "domain": "vapi.ai",
+    "company_overview": "Vapi is a voice AI platform that enables developers and enterprises to build, deploy, and manage conversational voice agents. The platform handles real-time audio orchestration and infrastructure to deliver scalable, sub-500ms latency voice experiences.",
+    "target_audience": "Developers, software engineers, and enterprise organizations across industries such as healthcare, automotive, freight, and customer support looking to automate voice calls.",
+    "contact_points": [
+      "support@vapi.ai",
+      "talent@vapi.ai"
+    ],
+    "leadership": [
+      {
+        "name": "Jayson Noland",
+        "role": "CFO",
+        "linkedin_url": null
+      }
+    ],
+    "confidence_score": 0.9,
+    "pages_scraped": [
+      "https://vapi.ai",
+      "https://vapi.ai/pricing",
+      "https://vapi.ai/customers",
+      "https://vapi.ai/careers",
+      "https://vapi.ai/privacy",
+      "https://vapi.ai/sales",
+      "https://vapi.ai/platform",
+      "https://vapi.ai/blog"
+    ],
+    "errors": [],
+    "estimated_input_tokens": 11943,
+    "estimated_output_tokens": 149,
+    "estimated_cost_usd": 0.003955
+  }
+]
